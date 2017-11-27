@@ -38,12 +38,13 @@ public abstract class AtomicModel extends Model {
 		else if(TIME_ADVANCE_NEEDED) {
 			deltaInt();
 		}
+		CurrentEventQueue.discreteTime++;
 	}
 	
 	private void handleLambda() {
 		log("output at " + CurrentEventQueue.getTimeString() + " - ");
-		output = lambda();
-		Arrays.stream(output).forEach(o -> System.out.println("\t\t\t"+o.getName()));
+		output.addAll(Arrays.asList(lambda()));
+		output.stream().forEach(o -> System.out.println("\t\t\t"+o.getName()));
 	}
 	
 	public void timeAdvance()

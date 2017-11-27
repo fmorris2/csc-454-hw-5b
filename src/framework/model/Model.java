@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
+import framework.model.event.CurrentEventQueue;
 import framework.model.event.DiscreteEvent;
-import framework.model.token.Token;
 import framework.model.token.input.InputToken;
 import framework.model.token.output.OutputToken;
 
@@ -18,8 +17,9 @@ public abstract class Model {
 	public static int numModels = 0;
 	
 	protected List<DiscreteEvent> queuedEvents = new ArrayList<>();
-	protected OutputToken[] output;
+	protected List<OutputToken> output = new ArrayList<>();
 	protected boolean isDebugMode;
+	protected double elapsedTime = 0, lastEventTime = 0;
 	
 	private int id;
 	
@@ -51,7 +51,7 @@ public abstract class Model {
 	*/
 	
 	public void resetInputAndOutput() {
-		output = null;
+		output.clear();
 		queuedEvents.clear();
 	}
 	
@@ -59,10 +59,12 @@ public abstract class Model {
 		queuedEvents.addAll(Arrays.asList(events));
 		debug("queued up " + events.length + " events for " + this 
 				+ "... model now has " + queuedEvents.size() + " queued events.");
+		elapsedTime = CurrentEventQueue.getRealTime() - lastEventTime;
+		lastEventTime = events[events.length - 1].REAL_TIME;
 	}
 	
 	protected void log(String str) {
-		System.out.println("["+getModelName()+ " " + id +"] - " + str);
+		System.out.println(this + " - " + str);
 	}
 	
 	protected void debug(String str) {
@@ -72,5 +74,9 @@ public abstract class Model {
 	
 	public void setDebugMode(boolean debug) {
 		isDebugMode = debug;
+	}
+	
+	public String toString() {
+		return "["+getModelName()+ " " + id +"]";
 	}
 }

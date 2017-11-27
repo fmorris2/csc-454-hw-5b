@@ -4,6 +4,7 @@ import framework.pqueue.CustomPriorityQueue;
 
 public class CurrentEventQueue {
 	private static CustomPriorityQueue queue;
+	public static int discreteTime;
 	
 	protected CurrentEventQueue() {
 		
@@ -24,6 +25,6 @@ public class CurrentEventQueue {
 	
 	public static String getTimeString() {
 		DiscreteEvent current = get().peek();
-		return current == null ? "(0,0)" : "("+current.REAL_TIME+","+current.DISCRETE_TIME+")";
+		return current == null ? "(0,0)" : "("+current.REAL_TIME+","+discreteTime+")";
 	}
 }

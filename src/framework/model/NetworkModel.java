@@ -2,7 +2,6 @@ package framework.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import framework.model.coupling.Coupling;
 import framework.model.event.CurrentEventQueue;
@@ -21,9 +20,7 @@ public abstract class NetworkModel extends Model {
 	
 	public NetworkModel build() {
 		this.subModels = getSubModels();
-		getCouplings().stream()
-			.filter(c -> verifyCoupling(c))
-			.forEach(c -> this.couplings.add(c));
+		couplings.addAll(getCouplings());
 		return this;
 	}
 	
@@ -38,7 +35,6 @@ public abstract class NetworkModel extends Model {
 		
 		CurrentEventQueue.get().clear();
 		prepareNextEvents();
-		//realTime = CURRENT_EVENTS.peek().REAL_TIME;
 		System.out.println("");
 	}
 	
@@ -46,7 +42,7 @@ public abstract class NetworkModel extends Model {
 		for(Model m : subModels) {
 			if(!m.queuedEvents.isEmpty()) {
 				m.executeFunctions();
-				if(m.output != null) {
+				if(!m.output.isEmpty()) {
 					routeOutput(m);
 				}
 				m.resetInputAndOutput();
@@ -55,14 +51,18 @@ public abstract class NetworkModel extends Model {
 	}
 	
 	private void routeOutput(Model m) {
+		debug("routeOutput for " + m);
 		couplings.stream()
 			.filter(c -> c.FIRST == m)
 			.forEach(c -> {
 				if(c.LAST == null) {
-					
+					debug("Routing output from " + m + " to " + this);
+					output.addAll(m.output);
 				}
 				else {
-					
+					debug("Routing output from " + m + " to " + c.LAST);
+					InputToken[] routedOutput = m.output.stream().map(o -> (InputToken)o).toArray(InputToken[]::new);
+					c.LAST.queueEvents(new InputEvent(CurrentEventQueue.getRealTime(), 0, routedOutput));
 				}
 			});
 	}
@@ -110,31 +110,6 @@ public abstract class NetworkModel extends Model {
 				((AtomicModel)m).timeAdvance();
 			}
 		}
-	}
-	
-	private boolean verifyCoupling(Coupling c) {
-		switch(c.TYPE) {
-		case INPUT_TO_INPUT:
-		case OUTPUT_TO_INPUT:
-			if(c.FIRST == c.LAST)
-				return false;
-			if(c.FIRST == null || c.LAST == null)
-				return true;
-			
-			return c.FIRST.INPUT_SET.stream().allMatch(i -> containsType(i, c.LAST.INPUT_SET));
-		default:
-			return true;
-		}
-	}
-	
-	private boolean containsType(InputToken<?> type, Set<InputToken<?>> set)
-	{
-		for(InputToken<?> t : set) {
-			if(type.getClass().equals(t.getClass()))
-				return true;
-		}
-		
-		return false;
 	}
 	
 	@Override

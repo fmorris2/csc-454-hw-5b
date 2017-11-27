@@ -12,7 +12,9 @@ public class SimulationDriver {
 		model.setDebugMode(false);
 		
 		InputEvent[] INPUT_TRAJECTORY = {
-				new InputEvent(0.4,0,new MetalBall()), new InputEvent(1.4,0,new MetalBall())
+				new InputEvent(0.3,0,new MetalBall()), new InputEvent(0.7,0,new MetalBall()),
+				new InputEvent(1.0,0,new MetalBall()), new InputEvent(1.5,0,new MetalBall()),
+				new InputEvent(3.5,0,new MetalBall())
 		};
 		
 		DevsSimulation sim = new DevsSimulation(model, INPUT_TRAJECTORY);

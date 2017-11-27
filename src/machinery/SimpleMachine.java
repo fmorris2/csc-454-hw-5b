@@ -18,6 +18,7 @@ public abstract class SimpleMachine extends AtomicModel {
 	
 	@Override
 	protected void deltaInt() {
+		debug("deltaInt for " + this);
 		partsBin.poll();		
 		timeRemaining = processingTime();
 		timeAdvance();
@@ -25,18 +26,20 @@ public abstract class SimpleMachine extends AtomicModel {
 	
 	@Override
 	protected OutputToken[] lambda() {
+		debug("lambda for " + this);
 		return OUTPUT_SET.stream().toArray(OutputToken[]::new);
 	}
 	
 	@Override
 	protected void deltaExt() {
+		debug("deltaExt for " + this);
 		if(partsBin.isEmpty()) {
 			timeRemaining = processingTime();
 		}
 		else {
-			System.out.println("deltaExt elapsedTime: " + CurrentEventQueue.get().getElapsedTime());
-			timeRemaining = timeRemaining - CurrentEventQueue.get().getElapsedTime();
-			System.out.println("deltaExt, timeRemaining: " + timeRemaining);
+			debug("deltaExt elapsedTime: " + elapsedTime);
+			timeRemaining = timeRemaining - elapsedTime;
+			debug("deltaExt, timeRemaining: " + timeRemaining);
 		}
 		
 		queuedEvents.stream()
@@ -49,6 +52,7 @@ public abstract class SimpleMachine extends AtomicModel {
 	
 	@Override
 	protected void deltaConf() {
+		debug("deltaConf for " + this);
 		deltaInt();
 		deltaExt();
 	}
