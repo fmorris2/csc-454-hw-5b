@@ -4,9 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import framework.model.event.CurrentEventQueue;
 import framework.model.event.DiscreteEvent;
-import framework.model.event.EventQueue;
+import framework.model.event.Schedulers;
 import framework.model.event.TimeAdvanceEvent;
 import framework.model.token.output.OutputToken;
 
@@ -38,24 +37,25 @@ public abstract class AtomicModel extends Model {
 		else if(TIME_ADVANCE_NEEDED) {
 			deltaInt();
 		}
-		CurrentEventQueue.discreteTime++;
+		Schedulers.CURRENT.incrementDiscreteTime();
 	}
 	
 	private void handleLambda() {
-		log("output at " + CurrentEventQueue.getTimeString() + " - ");
+		log("output at " + Schedulers.CURRENT.getTimeString() + " - ");
 		output.addAll(Arrays.asList(lambda()));
 		output.stream().forEach(o -> System.out.println("\t\t\t"+o.getName()));
 	}
 	
 	public void timeAdvance()
 	{
-		List<DiscreteEvent> temp = Arrays.stream(EventQueue.get().getElements())
+		//remove old time advance from global event queue if necessary
+		List<DiscreteEvent> temp = Arrays.stream(Schedulers.GLOBAL.getElements())
 			.collect(Collectors.toList());
 		temp.removeIf(event -> event instanceof TimeAdvanceEvent && ((TimeAdvanceEvent)event).getModel().getClass().equals(this.getClass()));
-		EventQueue.get().setElements(temp.toArray(new DiscreteEvent[temp.size()]));
+		Schedulers.GLOBAL.setElements(temp.toArray(new DiscreteEvent[temp.size()]));
 		
 		DiscreteEvent newTimeAdvance = generateTimeAdvanceEvent();
-		EventQueue.get().insert(newTimeAdvance);
+		Schedulers.GLOBAL.insert(newTimeAdvance);
 		debug("new time advance has been scheduled: " + newTimeAdvance);
 	}
 }

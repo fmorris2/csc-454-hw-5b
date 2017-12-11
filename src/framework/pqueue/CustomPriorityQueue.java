@@ -3,10 +3,13 @@ package framework.pqueue;
 import java.util.Arrays;
 
 import framework.model.event.DiscreteEvent;
+import framework.model.event.InputEvent;
+import framework.model.event.TimeAdvanceEvent;
 
 public class CustomPriorityQueue {
 	private DiscreteEvent[] orderedArray;
 	private double lastPolledRealTime;
+	private int discreteTime;
 	
 	public CustomPriorityQueue() {
 		orderedArray = new DiscreteEvent[0];
@@ -88,6 +91,27 @@ public class CustomPriorityQueue {
 		return orderedArray[0].REAL_TIME - lastPolledRealTime;
 	}
 	
+	public double getRealTime() {
+		DiscreteEvent current = peek();
+		return current == null ? 0 : current.REAL_TIME;
+	}
+	
+	public boolean hasNoInput() {
+		return Arrays.stream(orderedArray)
+						.noneMatch(e -> e instanceof InputEvent);
+	}
+	
+	public boolean hasAllInfTimeAdv() {
+		return Arrays.stream(orderedArray)
+				.filter(e -> e instanceof TimeAdvanceEvent)
+				.allMatch(e -> ((TimeAdvanceEvent)e).REAL_TIME >= Integer.MAX_VALUE);		
+	}
+	
+	public String getTimeString() {
+		DiscreteEvent current = peek();
+		return current == null ? "(0,0)" : "("+current.REAL_TIME+","+discreteTime+")";
+	}
+	
 	public DiscreteEvent[] getElements() {
 		return orderedArray;
 	}
@@ -102,5 +126,13 @@ public class CustomPriorityQueue {
 	
 	public boolean isEmpty() {
 		return size() == 0;
+	}
+	
+	public void resetDiscreteTime() {
+		discreteTime = 0;
+	}
+	
+	public void incrementDiscreteTime() {
+		discreteTime++;
 	}
 }

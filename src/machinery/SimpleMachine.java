@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import framework.model.AtomicModel;
-import framework.model.event.CurrentEventQueue;
 import framework.model.event.InputEvent;
 import framework.model.token.input.InputToken;
 import framework.model.token.output.OutputToken;

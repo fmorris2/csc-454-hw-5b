@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import framework.model.event.CurrentEventQueue;
 import framework.model.event.DiscreteEvent;
+import framework.model.event.Schedulers;
 import framework.model.token.input.InputToken;
 import framework.model.token.output.OutputToken;
 
@@ -36,20 +36,6 @@ public abstract class Model {
 	protected abstract String getStateString();
 	protected abstract void executeFunctions();
 	
-	
-	/*
-	public OutputToken[] executeLambda() {
-		debug("lambda is being executed for " + getModelName());
-		output = lambda.execute();
-		if(tick % internalTicks == 0) {
-			debug("State at internal tick #"+tick+": "+getStateString());
-			debug("Output at internal tick #"+tick+": ");
-			Arrays.stream(output).forEach(o -> debug("\t"+o.getName()));
-		}
-		return output;
-	}
-	*/
-	
 	public void resetInputAndOutput() {
 		output.clear();
 		queuedEvents.clear();
@@ -59,7 +45,7 @@ public abstract class Model {
 		queuedEvents.addAll(Arrays.asList(events));
 		debug("queued up " + events.length + " events for " + this 
 				+ "... model now has " + queuedEvents.size() + " queued events.");
-		elapsedTime = CurrentEventQueue.getRealTime() - lastEventTime;
+		elapsedTime = Schedulers.CURRENT.getRealTime() - lastEventTime;
 		lastEventTime = events[events.length - 1].REAL_TIME;
 	}
 	

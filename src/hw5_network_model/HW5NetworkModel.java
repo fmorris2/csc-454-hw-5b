@@ -9,7 +9,6 @@ import framework.model.Model;
 import framework.model.NetworkModel;
 import framework.model.coupling.Coupling;
 import framework.model.coupling.CouplingType;
-import framework.model.event.TimeAdvanceEvent;
 import framework.model.token.input.InputToken;
 import framework.model.token.output.OutputToken;
 import machinery.drill_model.DrillModel;

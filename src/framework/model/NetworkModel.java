@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import framework.model.coupling.Coupling;
-import framework.model.event.CurrentEventQueue;
 import framework.model.event.DiscreteEvent;
-import framework.model.event.EventQueue;
 import framework.model.event.InputEvent;
+import framework.model.event.Schedulers;
 import framework.model.event.TimeAdvanceEvent;
 import framework.model.token.input.InputToken;
 
@@ -25,15 +24,15 @@ public abstract class NetworkModel extends Model {
 	}
 	
 	public void run() {
-		debug("state at " + CurrentEventQueue.getTimeString() + " - " + this.getStateString());
-		debug("elapsed time: " + CurrentEventQueue.get().getElapsedTime());
-		debug("event queue size at " + CurrentEventQueue.getTimeString() + " - " + EventQueue.get().size());
-		debug("current events queue size at " + CurrentEventQueue.getTimeString() + " - " + CurrentEventQueue.get().size());
+		debug("state at " + Schedulers.CURRENT.getTimeString() + " - " + this.getStateString());
+		debug("elapsed time: " + Schedulers.CURRENT.getElapsedTime());
+		debug("event queue size at " + Schedulers.CURRENT.getTimeString() + " - " + Schedulers.GLOBAL.size());
+		debug("current events queue size at " + Schedulers.CURRENT.getTimeString() + " - " + Schedulers.CURRENT.size());
 	
-		passRelevantEventsToSubModels(CurrentEventQueue.get().getElements());
+		passRelevantEventsToSubModels(Schedulers.CURRENT.getElements());
 		executeSubModelsWithEvents();
 		
-		CurrentEventQueue.get().clear();
+		Schedulers.CURRENT.clear();
 		prepareNextEvents();
 		System.out.println("");
 	}
@@ -62,7 +61,7 @@ public abstract class NetworkModel extends Model {
 				else {
 					debug("Routing output from " + m + " to " + c.LAST);
 					InputToken[] routedOutput = m.output.stream().map(o -> (InputToken)o).toArray(InputToken[]::new);
-					c.LAST.queueEvents(new InputEvent(CurrentEventQueue.getRealTime(), 0, routedOutput));
+					c.LAST.queueEvents(new InputEvent(Schedulers.CURRENT.getRealTime(), 0, routedOutput));
 				}
 			});
 	}
@@ -92,12 +91,13 @@ public abstract class NetworkModel extends Model {
 	}
 	
 	private void prepareNextEvents() {
-		if(!EventQueue.get().isEmpty()) {
+		if(!Schedulers.GLOBAL.isEmpty()) {
 			do {
-				DiscreteEvent event = EventQueue.get().poll();
+				DiscreteEvent event = Schedulers.GLOBAL.poll();
 				debug("Adding event from event queue to current events: " + event);
-				CurrentEventQueue.get().insert(event);
-			}while(!EventQueue.get().isEmpty() && EventQueue.get().peek().REAL_TIME <= CurrentEventQueue.getRealTime());
+				Schedulers.CURRENT.insert(event);
+			}while(!Schedulers.GLOBAL.isEmpty() 
+					&& Schedulers.GLOBAL.peek().REAL_TIME <= Schedulers.CURRENT.getRealTime());
 		}
 	}
 	
