@@ -1,5 +1,5 @@
 # CSC 454 - HW 5B
-```
+
 In this homework you will modify your framework (and possibly fix it, depending on what you did in HW3) to support discrete event simulation, and you will also implement the following network model in it:
 
 The network consists of two machines for working metal. A press flattens small metal balls into disks. It has a bin to hold balls that are waiting to be pressed. A drill puts a hole in the center of each disk, and it also has a bin to hold disks waiting to be drilled. The press flattens a ball in one second, but the drill needs two seconds to do its job. These two machines are connected sequentially: the output from the press goes directly to the input of the drill. The input to the network is coupled with the input to the press, and the output from the drill is coupled with the output from the network.
@@ -21,4 +21,3 @@ On receiving a number q of parts, the external transition function will place th
 When new parts arrive and a part is completed simultaneously, the confluent transition function ejects the completed part, stores the incoming parts, and begins operating on a new part. This is formalized as deltacon((p, s), q) = (p + q - 1, t).
 
 Remember to implement a binary heap (one possible implementation of the priority queue ADT) to use for the event schedule. While we are modeling a network of only two models here, your framework has to support an unlimited number of models / events. Also, your heap must be generic enough to fit in your framework.
-```
